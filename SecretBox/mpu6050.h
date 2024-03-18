@@ -40,6 +40,7 @@ void dmpDataReady();
 void mpu_setup();
 //Function to constantly update mpu readings from DMP
 void mpu_update();
+void mpu_clearBuffer();
 
 //Returning required angles to be input for PID
 float return_yaw();   //around Z

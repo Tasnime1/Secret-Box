@@ -144,6 +144,14 @@ void mpu_setup() {
 void mpu_update() {
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
+
+  //testing overflow 
+  if (fifoCount == 1024)
+  {
+    mpu.resetFIFO();
+    Serial.println("FIFO overflow");
+  }
+  
   // read a packet from FIFO
   if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) 
   { 
@@ -156,9 +164,6 @@ void mpu_update() {
 }
 
 
-//since mpu in my application is mounted on the breadboard in a upstanding manner
-//there these offsets are to be subtracted from reading to indicate initial position
-//as all zeros.
 float return_yaw() {
   return (ypr[0] * 180 / M_PI);
 }
@@ -169,4 +174,9 @@ float return_pitch() {
 
 float return_roll() {
   return (ypr[2] * 180 / M_PI);
+}
+
+void mpu_clearBuffer()
+{
+
 }

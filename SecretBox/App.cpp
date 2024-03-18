@@ -30,6 +30,9 @@ float distance;
 float batteryVoltage;
 float batteryPercentage;
 
+struct tm timeinfo;
+String timestamp = "";
+
 /*- WI-FI AND NTP SERVER CREDENTIALS
 ************************************************************************************************/
 const char* ssid       = "RAMADAN";
@@ -55,26 +58,10 @@ void App_init(void) {
   /*Initialize Built-In LED for debugging purposes*/
   pinMode(BuilInLed, OUTPUT);
 
-  //Connect to WiFi to retrieve current data and time from NTP
-  //Network Time Protocol
-  Serial.printf("Connecting to %s ", ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-  }
-  Serial.println(" CONNECTED");
-  
-  //Init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  struct tm timeinfo;
-  if (getLocalTime(&timeinfo))
-  {
-    rtc.setTimeStruct(timeinfo); 
-  }
-  //Disconnect WiFi as it's no longer needed
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
+  /*Conenct to WI-FI*/
+  APP_connectWIFI();
+
+  //APP_disconnectWIFI();
 }
 
 /**************************************
@@ -96,9 +83,6 @@ void App_start(void) {
   /*Checking battery volt and percentage*/
   APP_getBatteryReadings();
 
-  /*Getting timestamp*/
-  String timestamp = rtc.getDateTime(true);
-  Serial.println(timestamp);
 }
 
 void APP_getMPUreadings(void)
@@ -152,6 +136,10 @@ void APP_checkBoxHasFallen(void)
   if( ( abs(pitch)>tiltAngle ) || ( abs(roll)>tiltAngle ) )
   {
     Serial.println("Box has fallen down");
+    /*Fetch current date and time from NTP*/
+    APP_fetchCurrentDateAndTime();
+    Serial.println(timestamp);
+
     digitalWrite(BuilInLed, HIGH);
     delay(100);
     digitalWrite(BuilInLed, LOW);
@@ -164,12 +152,56 @@ void APP_checkBoxHasBeenOpened()
   /*Checking box has been opened*/
   if(distance>boxDepth)
   {
-    Serial.println("BOX HAS BEEN OPENED!!");
+    Serial.println("Box has been opened");
+    /*Fetch current date and time from NTP*/
+    APP_fetchCurrentDateAndTime();
+    Serial.println(timestamp);
+
     digitalWrite(BuilInLed, HIGH);
     delay(100);
     digitalWrite(BuilInLed, LOW);
     delay(100);
   }
 }
+
+/*API to connect to Wifi*/
+void APP_connectWIFI()
+{
+  //Connect to WiFi to retrieve current data and time from NTP
+  //Network Time Protocol
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
+  
+}
+
+/*API to disconnect from Wifi*/
+void APP_disconnectWIFI()
+{
+  //Disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+}
+
+/*Fetch current date and time from NTP*/
+void APP_fetchCurrentDateAndTime()
+{
+  //Init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  
+  if (getLocalTime(&timeinfo))
+  {
+    rtc.setTimeStruct(timeinfo); 
+  }
+  /*Getting timestamp*/
+  timestamp = rtc.getDateTime(true);
+  Serial.println(timestamp);
+}
+
+
 
 

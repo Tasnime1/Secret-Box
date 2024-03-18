@@ -27,10 +27,14 @@
 ************************************************************************************************/
 void App_init(void);
 void App_start(void);
-void APP_getMPUreadings();
-void APP_checkBoxHasFallen();
-void APP_getUltrasonicReading();
-void APP_checkBoxHasBeenOpened();
-void APP_getBatteryReadings();
+void APP_getMPUreadings(void);
+void APP_checkBoxHasFallen(void);
+void APP_getUltrasonicReading(void);
+void APP_checkBoxHasBeenOpened(void);
+void APP_getBatteryReadings(void);
+void APP_connectWIFI(void);
+void APP_disconnectWIFI(void);
+void APP_fetchCurrentDateAndTime(void);
+void APP_getCurrentTimeStamp(void);
 
 #endif /* APP.H */
