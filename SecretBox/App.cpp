@@ -42,6 +42,11 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 3600;
 const int   daylightOffset_sec = 3600;
 
+/*- Firebase
+************************************************************************************************/
+#define REFERENCE_URL "https://thesecretbox-a6d98-default-rtdb.firebaseio.com/"  // Your Firebase project reference url
+Firebase firebase(REFERENCE_URL);
+
 //ESP32Time rtc;
 ESP32Time rtc(0);  // offset in seconds
 
@@ -119,14 +124,18 @@ void APP_getBatteryReadings(void)
   //Calculating battery voltage and percentage
   batteryVoltage = Battery_getBatteryVoltage();
   batteryPercentage = Battery_getBatteryPercentage();
+  firebase.setFloat("Battery/Battery Voltage", batteryVoltage);
+  firebase.setFloat("Battery/battery Percentage", batteryPercentage);
 
   /*DEBUGGING FOR BATTERY*/
+  /**
   Serial.print("Battery Voltage: ");
   Serial.println(batteryVoltage);
 
   Serial.print("Battery Percentage: ");
   Serial.print(batteryPercentage);
   Serial.println("%");
+  **/
 
 }
 
@@ -138,7 +147,7 @@ void APP_checkBoxHasFallen(void)
     Serial.println("Box has fallen down");
     /*Fetch current date and time from NTP*/
     APP_fetchCurrentDateAndTime();
-    Serial.println(timestamp);
+    firebase.pushString("box Fallen", timestamp);
 
     digitalWrite(BuilInLed, HIGH);
     delay(100);
@@ -155,7 +164,7 @@ void APP_checkBoxHasBeenOpened()
     Serial.println("Box has been opened");
     /*Fetch current date and time from NTP*/
     APP_fetchCurrentDateAndTime();
-    Serial.println(timestamp);
+    firebase.pushString("box opened", timestamp);
 
     digitalWrite(BuilInLed, HIGH);
     delay(100);
@@ -199,7 +208,7 @@ void APP_fetchCurrentDateAndTime()
   }
   /*Getting timestamp*/
   timestamp = rtc.getDateTime(true);
-  Serial.println(timestamp);
+  //Serial.println(timestamp);
 }
 
 

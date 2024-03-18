@@ -22,6 +22,7 @@
 #include <WiFi.h>
 #include "time.h"
 #include <ESP32Time.h>
+#include <ESP32Firebase.h>
 
 /*- FUNCTIONS' PROTOTYES
 ************************************************************************************************/
